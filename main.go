@@ -4,11 +4,19 @@ import (
 	"fmt"
 	"getir-case-study/api/fetch"
 	"getir-case-study/api/inmemory"
+	"getir-case-study/pkg"
 	"log"
 	"net/http"
+
+	"github.com/caarlos0/env"
 )
 
 func main() {
+	cfg := pkg.Config{}
+	if err := env.Parse(&cfg); err != nil {
+		log.Fatal("failed to load config")
+	}
+
 	fetchHandler := fetch.NewHandler()
 	inmemoryHandler := inmemory.NewHandler()
 

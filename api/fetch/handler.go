@@ -17,3 +17,7 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 	}
 }
+
+func (h *Handler) FetchEntriesBy(r request) {
+
+}
