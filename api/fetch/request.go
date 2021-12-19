@@ -1,7 +1,7 @@
 package fetch
 
 import (
-	"getir-case-study/pkg"
+	"getir-case-study/pkg/utils"
 	"time"
 )
 
@@ -12,10 +12,15 @@ type request struct {
 	MaxCount  int    `json:"maxCount"`
 }
 
-func (r *request) ParseStartDate() (time.Time, error) {
-	return time.Parse(pkg.DateFormat, r.StartDate)
-}
+func (r *request) Validate() (bool, time.Time, time.Time) {
+	valid := true
 
-func (r *request) ParseEndDate() (time.Time, error) {
-	return time.Parse(pkg.DateFormat, r.EndDate)
+	startTime, err := time.Parse(utils.DateFormat, r.StartDate)
+	endTime, err := time.Parse(utils.DateFormat, r.EndDate)
+
+	if err != nil || r.MaxCount < r.MinCount {
+		valid = false
+	}
+
+	return valid, startTime, endTime
 }

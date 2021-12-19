@@ -1,23 +1,66 @@
 package fetch
 
-import "net/http"
+import (
+	"encoding/json"
+	"getir-case-study/pkg/db"
+	"getir-case-study/pkg/utils"
+	"io/ioutil"
+	"net/http"
+)
 
 type Handler struct {
+	dbReader db.Reader
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(dbReader db.Reader) *Handler {
+	return &Handler{
+		dbReader: dbReader,
+	}
 }
 
 func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case "GET":
+	case "POST":
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			h.sendError(w, utils.ErrInvalidInput)
 
+			return
+		}
+
+		var payload request
+		if err := json.Unmarshal(body, &payload); err != nil {
+			h.sendError(w, utils.ErrInvalidInput)
+
+			return
+		}
+
+		valid, startTime, endTime := payload.Validate()
+		if !valid {
+			h.sendError(w, utils.ErrInvalidInput)
+
+			return
+		}
+
+		records, err := h.dbReader.RecordsByDateAndCountRange(
+			r.Context(),
+			db.DateRange{
+				Start: startTime,
+				End:   endTime,
+			},
+			db.CountRange{
+				Min: payload.MinCount,
+				Max: payload.MaxCount,
+			},
+		)
+		if err != nil {
+			h.sendError(w, utils.ErrDatabaseError)
+
+			return
+		}
+
+		h.sendResponse(w, records)
 	default:
-		http.Error(w, "404 not found.", http.StatusNotFound)
+		utils.NotFound(w)
 	}
-}
-
-func (h *Handler) FetchEntriesBy(r request) {
-
 }
