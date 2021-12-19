@@ -18,7 +18,7 @@ func NewMapStorage() Storage {
 func (m *MapStorage) Put(key, value string) error {
 	// I'm enforcing as non-empty constraint, here.
 	// Just a personal choice, for the assignment.
-	if len(strings.TrimSpace(value)) == 0 {
+	if len(strings.TrimSpace(key)) == 0 || len(strings.TrimSpace(value)) == 0 {
 		return utils.ErrEmptyValue
 	}
 

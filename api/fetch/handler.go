@@ -46,6 +46,13 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /fetch [post]
 func (h *Handler) fetch(w http.ResponseWriter, r *http.Request) {
+	if err := api.RequireJson(r); err != nil {
+		api.SendError(w, err)
+
+		return
+	}
+	api.SetJson(w)
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to read request body")

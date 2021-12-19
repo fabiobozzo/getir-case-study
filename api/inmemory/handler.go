@@ -49,6 +49,13 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /in-memory [post]
 func (h *Handler) storagePut(w http.ResponseWriter, r *http.Request) {
+	if err := api.RequireJson(r); err != nil {
+		api.SendError(w, err)
+
+		return
+	}
+	api.SetJson(w)
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to read request body")
@@ -98,6 +105,8 @@ func (h *Handler) storagePut(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /in-memory [get]
 func (h *Handler) storageGet(w http.ResponseWriter, r *http.Request) {
+	api.SetJson(w)
+
 	key := r.URL.Query().Get("key")
 	if len(strings.TrimSpace(key)) == 0 {
 		api.SendError(w, utils.ErrInvalidInput)

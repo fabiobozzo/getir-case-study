@@ -9,8 +9,13 @@ import (
 
 func SendError(w http.ResponseWriter, e error) {
 	code := 999
-	if mappedCode, exists := utils.Errors[e]; exists {
+	if mappedCode, exists := utils.ErrorCodeMap[e]; exists {
 		code = mappedCode
+	}
+
+	status := 200
+	if mappedStatus, exists := utils.ErrorStatusMap[e]; exists {
+		status = mappedStatus
 	}
 
 	resJson, err := json.Marshal(&map[string]interface{}{
@@ -21,5 +26,6 @@ func SendError(w http.ResponseWriter, e error) {
 		log.Fatal(err)
 	}
 
+	w.WriteHeader(status)
 	w.Write(resJson)
 }
