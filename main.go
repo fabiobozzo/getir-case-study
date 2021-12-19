@@ -7,6 +7,7 @@ import (
 	"getir-case-study/api/inmemory"
 	"getir-case-study/pkg"
 	"getir-case-study/pkg/db/mongo"
+	"getir-case-study/pkg/kv"
 	"net/http"
 	"os"
 
@@ -35,8 +36,10 @@ func main() {
 		logger.Fatalf("error connecting to mongodb cluster: %s", err)
 	}
 
+	kvStorage := kv.NewMapStorage()
+
 	fetchHandler := fetch.NewHandler(mongo.NewReader(mongoDb, cfg.CollectionName))
-	inmemoryHandler := inmemory.NewHandler()
+	inmemoryHandler := inmemory.NewHandler(kvStorage)
 
 	http.HandleFunc("/fetch", fetchHandler.Handle)
 	http.HandleFunc("/in-memory", inmemoryHandler.Handle)

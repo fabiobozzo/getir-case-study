@@ -1,4 +1,4 @@
-package fetch
+package api
 
 import (
 	"encoding/json"
@@ -7,15 +7,15 @@ import (
 	"net/http"
 )
 
-func (h *Handler) sendError(w http.ResponseWriter, e error) {
+func SendError(w http.ResponseWriter, e error) {
 	code := 999
 	if mappedCode, exists := utils.Errors[e]; exists {
 		code = mappedCode
 	}
 
-	resJson, err := json.Marshal(&response{
-		Code:    code,
-		Message: e.Error(),
+	resJson, err := json.Marshal(&map[string]interface{}{
+		"code": code,
+		"msg":  e.Error(),
 	})
 	if err != nil {
 		log.Fatal(err)

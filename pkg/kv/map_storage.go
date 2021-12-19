@@ -30,7 +30,7 @@ func (m *MapStorage) Put(key, value string) error {
 func (m *MapStorage) Get(key string) (string, error) {
 	value, found := m.keys[key]
 	if !found {
-		return "", utils.ErrNonExistingKey
+		return "", utils.ErrKeyNotFound
 	}
 
 	return value, nil

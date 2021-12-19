@@ -2,6 +2,7 @@ package fetch
 
 import (
 	"encoding/json"
+	"getir-case-study/api"
 	"getir-case-study/pkg/model"
 	"getir-case-study/pkg/utils"
 	"net/http"
@@ -19,7 +20,7 @@ type record struct {
 	TotalCount int    `json:"totalCount"`
 }
 
-func (h *Handler) sendResponse(w http.ResponseWriter, records []model.Record) {
+func sendResponse(w http.ResponseWriter, records []model.Record) {
 	var resRecords []record
 	for i := range records {
 		r := records[i]
@@ -41,7 +42,7 @@ func (h *Handler) sendResponse(w http.ResponseWriter, records []model.Record) {
 		Records: resRecords,
 	})
 	if err != nil {
-		h.sendError(w, err)
+		api.SendError(w, utils.ErrInternalError)
 	}
 
 	w.Write(resJson)
