@@ -8,14 +8,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
 	storage kv.Storage
+	logger  *logrus.Logger
 }
 
-func NewHandler(storage kv.Storage) *Handler {
+func NewHandler(logger *logrus.Logger, storage kv.Storage) *Handler {
 	return &Handler{
+		logger:  logger,
 		storage: storage,
 	}
 }
@@ -34,6 +38,7 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to read request body")
 		api.SendError(w, utils.ErrInvalidInput)
 
 		return
@@ -41,12 +46,14 @@ func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
 
 	var payload request
 	if err := json.Unmarshal(body, &payload); err != nil {
+		h.logger.WithError(err).Error("failed to unmarshal json to payload struct")
 		api.SendError(w, utils.ErrInvalidInput)
 
 		return
 	}
 
 	if err = h.storage.Put(payload.Key, payload.Value); err != nil {
+		h.logger.WithError(err).Error("failed to put value in kv storage")
 		api.SendError(w, utils.ErrStorageError)
 
 		return
@@ -75,6 +82,7 @@ func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
 
 	value, err := h.storage.Get(key)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to read value from kv storage")
 		api.SendError(w, utils.ErrKeyNotFound)
 
 		return

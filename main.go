@@ -38,8 +38,8 @@ func main() {
 
 	kvStorage := kv.NewMapStorage()
 
-	fetchHandler := fetch.NewHandler(mongo.NewReader(mongoDb, cfg.CollectionName))
-	inmemoryHandler := inmemory.NewHandler(kvStorage)
+	fetchHandler := fetch.NewHandler(logger, mongo.NewReader(mongoDb, cfg.CollectionName))
+	inmemoryHandler := inmemory.NewHandler(logger, kvStorage)
 
 	http.HandleFunc("/fetch", fetchHandler.Handle)
 	http.HandleFunc("/in-memory", inmemoryHandler.Handle)
