@@ -1,0 +1,130 @@
+definitions:
+  fetch.request:
+    properties:
+      endDate:
+        type: string
+      maxCount:
+        type: integer
+      minCount:
+        type: integer
+      startDate:
+        type: string
+    type: object
+  inmemory.request:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+info:
+  contact:
+    email: fabio.bozzo@gmail.com
+    name: Fabio Bozzo
+  description: The case study for the position of Go developer @Getir
+  title: Getir Coding Assignment
+  version: "1.0"
+paths:
+  /fetch:
+    post:
+      consumes:
+      - application/json
+      description: Filter records by date and total count range
+      operationId: fetch-post
+      parameters:
+      - description: Search Filter
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/fetch.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Fetch records from DB
+      tags:
+      - Fetch
+  /in-memory:
+    get:
+      consumes:
+      - text/plain
+      operationId: in-memory-get
+      parameters:
+      - description: key of the key-value pair
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Find/Read a key-value pair from the in-mem storage
+      tags:
+      - In-Memory
+    post:
+      consumes:
+      - application/json
+      description: Only non-empty values are accepted
+      operationId: in-memory-post
+      parameters:
+      - description: Key-Value Pair
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/inmemory.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Insert a key-value pair in the in-mem storage
+      tags:
+      - In-Memory
+swagger: "2.0"

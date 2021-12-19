@@ -11,11 +11,18 @@ import (
 	"net/http"
 	"os"
 
+	_ "getir-case-study/docs"
+
 	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
+// @title Getir Coding Assignment
+// @version 1.0
+// @description The case study for the position of Go developer @Getir
+// @contact.name Fabio Bozzo
+// @contact.email fabio.bozzo@gmail.com
 func main() {
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
@@ -43,6 +50,8 @@ func main() {
 
 	http.HandleFunc("/fetch", fetchHandler.Handle)
 	http.HandleFunc("/in-memory", inmemoryHandler.Handle)
+
+	http.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Printf("Starting server...\n")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

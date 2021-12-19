@@ -27,15 +27,28 @@ func NewHandler(logger *logrus.Logger, storage kv.Storage) *Handler {
 func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-		h.handlePost(w, r)
+		h.storagePut(w, r)
 	case "GET":
-		h.handleGet(w, r)
+		h.storageGet(w, r)
 	default:
 
 	}
 }
 
-func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
+// storagePut godoc
+// @Summary Insert a key-value pair in the in-mem storage
+// @Description Only non-empty values are accepted
+// @Tags In-Memory
+// @ID in-memory-post
+// @Accept json
+// @Produce json
+// @Param payload body request true "Key-Value Pair"
+// @Success 200 {string} string "Ok"
+// @Success 400 {string} string "Bad Request"
+// @Success 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /in-memory [post]
+func (h *Handler) storagePut(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to read request body")
@@ -72,7 +85,19 @@ func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJson)
 }
 
-func (h *Handler) handleGet(w http.ResponseWriter, r *http.Request) {
+// storageGet godoc
+// @Summary Find/Read a key-value pair from the in-mem storage
+// @Tags In-Memory
+// @ID in-memory-get
+// @Accept plain
+// @Produce json
+// @Param key query string true "key of the key-value pair"
+// @Success 200 {string} string "Ok"
+// @Success 400 {string} string "Bad Request"
+// @Success 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /in-memory [get]
+func (h *Handler) storageGet(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
 	if len(strings.TrimSpace(key)) == 0 {
 		api.SendError(w, utils.ErrInvalidInput)

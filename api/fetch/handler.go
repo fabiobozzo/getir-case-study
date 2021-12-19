@@ -26,13 +26,26 @@ func NewHandler(logger *logrus.Logger, dbReader db.Reader) *Handler {
 func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-		h.handlePost(w, r)
+		h.fetch(w, r)
 	default:
 		utils.NotFound(w)
 	}
 }
 
-func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
+// fetch godoc
+// @Summary Fetch records from DB
+// @Description Filter records by date and total count range
+// @Tags Fetch
+// @ID fetch-post
+// @Accept json
+// @Produce json
+// @Param payload body request true "Search Filter"
+// @Success 200 {string} string "Ok"
+// @Success 400 {string} string "Bad Request"
+// @Success 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /fetch [post]
+func (h *Handler) fetch(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to read request body")
