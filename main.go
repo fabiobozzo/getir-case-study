@@ -30,7 +30,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		logger.Fatalf("error loading .env file: %s", err)
+		logger.Warnf("error loading .env file: %s", err)
 	}
 
 	cfg := pkg.Config{}
@@ -53,8 +53,13 @@ func main() {
 
 	http.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("./static"))))
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	fmt.Printf("Starting server...\n")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil); err != nil {
 		logger.Fatalf("Server terminated ungracefully: %s", err)
 	}
 }
